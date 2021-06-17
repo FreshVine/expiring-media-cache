@@ -31,10 +31,8 @@
     },
     "autoload-dev": {
         "psr-0": {
-            "TestSourceParser": "test/",
-            "SourceParserTest": "test/",
-            "CommonMarkTest": "test/",
-            "CommonMarkTestWeak": "test/"
+            "TestExpiringMediaCache": "test/",
+            "ExpiringMediaCacheTest": "test/"
         }
     }
 }
