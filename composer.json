@@ -1,5 +1,5 @@
 {
-    "name": "FreshVine/ExpiringMediaCache",
+    "name": "freshvine/expiringmediacache",
     "description": "A simple way to cache media locally and remove it after it expires.",
     "keywords": ["cache", "media", "images", "expire", "video"],
     "type": "library",
