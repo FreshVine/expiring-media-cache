@@ -116,6 +116,53 @@ class ExpiringMediaCacheTest extends TestCase{
 	}
 
 
+	/**
+	 * The purpose of this test is to ensure that prefixes are added to local filenames
+	 */
+	function testPrefix(){
+		unlink( $this->ExpiringMediaCache->getLocalPath() . 'chapel-cluny-museum.jpg' );	// Remove the Media Directly
+
+		$this->ExpiringMediaCache->cleanUp();
+		$this->ExpiringMediaCache->writeCache();
+		$this->ExpiringMediaCache->reloadCache();
+		
+
+		$this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'chapel-cluny-museum.jpg', 'prefix' );
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'prefix-chapel-cluny-museum.jpg');
+	}
+
+
+	/**
+	 * The purpose of this test is to ensure that suffixes are added to local filenames
+	 */
+	function testSuffix(){
+		unlink( $this->ExpiringMediaCache->getLocalPath() . 'prefix-chapel-cluny-museum.jpg' );	// Remove the Media Directly
+
+		$this->ExpiringMediaCache->cleanUp();
+		$this->ExpiringMediaCache->writeCache();
+		$this->ExpiringMediaCache->reloadCache();
+
+
+		$this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'chapel-cluny-museum.jpg', null, 'suffix');
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'chapel-cluny-museum-suffix.jpg');
+	}
+
+
+	/**
+	 * The purpose of this test is to ensure that prefixes and suffixes are added to local filenames
+	 */
+	function testPrefixSuffix(){
+		unlink( $this->ExpiringMediaCache->getLocalPath() . 'chapel-cluny-museum-suffix.jpg' );	// Remove the Media Directly
+
+		$this->ExpiringMediaCache->cleanUp();
+		$this->ExpiringMediaCache->writeCache();
+		$this->ExpiringMediaCache->reloadCache();
+
+		$this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'chapel-cluny-museum.jpg', 'prefix', 'suffix');
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'prefix-chapel-cluny-museum-suffix.jpg');
+	}
+
+
 	public function testLateStaticBinding(){
 		$ExpiringMediaCache = ExpiringMediaCache::instance();
 		$this->assertInstanceOf('FreshVine\ExpiringMediaCache\ExpiringMediaCache', $ExpiringMediaCache);
