@@ -146,7 +146,7 @@ class FileLocal extends FileController{
 	 */
 	public function fileDelete( string $FullFilePath ){
 		if( $this->fileExists( $FullFilePath ) == false ){
-			false
+			return false;
 		}
 
 		
