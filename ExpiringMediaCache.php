@@ -164,7 +164,6 @@ class ExpiringMediaCache{
 	 */
 	public function cleanUp(){
 		$ExpectedFiles = array('cache' => '_media-cache.json');	// Key => Filename
-		
 
 		foreach( $this->mediaIndex as $k => $CacheObject ){
 			$FileShouldRemain = true;
@@ -193,13 +192,13 @@ class ExpiringMediaCache{
 
 		// Remove any files from the cache directory which are not expected to be there
 		$LiveFiles = $this->FileController->listFiles();
-		$ExtraFiles = array_diff( $LiveFiles, $ExpectedFiles );
+		$ExtraFiles = array_diff( $LiveFiles, $ExpectedFiles );		// Find what should not be there
+		$ExtraFiles = array_diff( $ExtraFiles, array('..', '.'));	// Ensure we don't have any weird directories
 		if( !empty( $ExtraFiles ) ){
 			foreach( $ExtraFiles as $filename ){
 				$this->FileController->fileDelete( $this->getLocalPath() . $filename );
 			}
 		}
-
 
 		return true;
 	}
