@@ -65,5 +65,34 @@ class ExpiringMediaCacheTest extends TestCase{
 		$this->assertImagesSame( $this->ExpiringMediaCache->getLocalPath() . 'chapel-cluny-museum.jpg', __DIR__ . '/images/chapel-cluny-museum.jpg' );
 	}
 
+
+	/**
+	 * Test the suffixing when different files with the same filename are attempted to be cached
+	 */
+	function testSameFilenames(){
+		$Media = array();
+		$Media['cluny'] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . '01/copy-test.jpg?match=cluny' );
+		$Media['lucy'] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . '02/copy-test.jpg?match=lucy' );
+		$Media['cannes'] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . '03/copy-test.jpg?match=cannes' );
+
+
+		// Ensure that the media were cached with the right file names now exist
+		$this->assertEquals( $Media['cluny']->getCacheFilename(), 'copy-test.jpg', "Cache Filename does not match expectation");
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'copy-test.jpg');
+
+		$this->assertEquals( $Media['lucy']->getCacheFilename(), 'copy-test-v01.jpg', "Cache Filename does not match expectation");
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'copy-test-v01.jpg');
+
+		$this->assertEquals( $Media['cannes']->getCacheFilename(), 'copy-test-v02.jpg', "Cache Filename does not match expectation");
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'copy-test-v02.jpg');
+
+
+		// Ensure that the files were the same as the remote ones - these copies are smaller to save space, so we are checking for similarity
+		$this->assertImageSimilarity( $this->ExpiringMediaCache->getLocalPath() . $Media['cluny']->getCacheFilename(), __DIR__ . '/images/chapel-cluny-museum.jpg', 0.1 );
+		$this->assertImageSimilarity( $this->ExpiringMediaCache->getLocalPath() . $Media['lucy']->getCacheFilename(), __DIR__ . '/images/lucy-as-kitten-2.jpg', 0.1 );
+		$this->assertImageSimilarity( $this->ExpiringMediaCache->getLocalPath() . $Media['cannes']->getCacheFilename(), __DIR__ . '/images/ville-de-cannes.jpg', 0.1 );
+	}
+
+
 	}
 }
