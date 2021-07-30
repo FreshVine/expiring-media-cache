@@ -30,7 +30,7 @@ class ExpiringMediaCache{
 
 
 	function __construct( $localPath = NULL, $localPublicURL = NULL){
-		$this->FileController = new Controllers\FileLocal( $this );	// The Media Controller will fetch and store remote media
+		$this->setFileController( new Controllers\FileLocal( $this ) );	// The Media Controller will fetch and store remote media
 		$this->CacheController = new Controllers\Cache( $this );	// The Cache controller manages and CRUDs the cache
 
 		// Allow for overloading the constructor values
@@ -251,22 +251,19 @@ class ExpiringMediaCache{
 	/*
 	 *  Getters
 	 */
-	function getCacheDuration(){
+	public function getCacheMethod(){
+		$this->CacheController->getCacheMethod();
+	}
+	public function getLifetime(){
 		return $this->CacheController->getLifetime();
 	}
-	function getCacheMethod(){
-		return $this->CacheController->getCacheMethod();
-	}
-	function getLifetime(){
-		return $this->CacheController->getLifetime();
-	}
-	function getLocalPath(){
+	public function getLocalPath(){
 		return $this->CacheController->getLocalPath();
 	}
-	function getLocalPublicURL(){
+	public function getLocalPublicURL(){
 		return $this->localPublicURL;
 	}
-	function getMediaIndex(){
+	public function getMediaIndex(){
 		return $this->mediaIndex;
 	}
 	/*
@@ -295,12 +292,6 @@ class ExpiringMediaCache{
 
 	public function setLifetime(int $Lifetime){
 		$this->CacheController->setLifetime( $Lifetime );
-
-		return $this;
-	}
-
-	function setCachePoint($cachePoint){
-		$this->cachePoint = $cachePoint;
 
 		return $this;
 	}
