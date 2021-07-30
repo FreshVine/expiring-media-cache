@@ -116,14 +116,7 @@ class ExpiringMediaCacheTest extends TestCase{
 	/**
 	 * This is here to ensure that we clean everything up after each run. Since this is a caching library having files lingering could screw up our results.
 	 */
-	public static function tearDownAfterClass(): void {
-		// We need to clean up the directories that we made
-
-		unset( $this->ExpiringMediaCache );
-
-
-		print "tearDownAfterClass" . PHP_EOL;
-
+	public static function setUpBeforeClass(): void {
 		$TemporaryDirectories = array(
 			__DIR__ . '/media-cache/',
 			__DIR__ . '/another-cache/'
@@ -139,6 +132,30 @@ class ExpiringMediaCacheTest extends TestCase{
 			}
 
 			rmdir( $dir );
+		}
+	}
+
+
+	/**
+	 * This is here to ensure that we clean everything up after each run. Since this is a caching library having files lingering could screw up our results.
+	 */
+	public static function tearDownAfterClass(): void {
+		// We need to clean up the directories that we made
+		$TemporaryDirectories = array(
+			__DIR__ . '/media-cache/',
+			__DIR__ . '/another-cache/'
+		);
+
+		foreach( $TemporaryDirectories as $dir ){
+			if( !file_exists( $dir ) )
+				continue;
+
+			$files = array_diff(scandir($dir), array('.','..'));
+			foreach ($files as $file) {
+				unlink("$dir/$file");
+			}
+
+			// rmdir( $dir );
 		}
 	}
 }
