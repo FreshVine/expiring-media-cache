@@ -94,5 +94,51 @@ class ExpiringMediaCacheTest extends TestCase{
 	}
 
 
+	public function testLateStaticBinding(){
+		$ExpiringMediaCache = ExpiringMediaCache::instance();
+		$this->assertInstanceOf('FreshVine\ExpiringMediaCache\ExpiringMediaCache', $ExpiringMediaCache);
+
+		// After instance is already called on ExpiringMediaCache
+		// subsequent calls with the same arguments return the same instance
+		$sameExpiringMediaCache = TestExpiringMediaCache::instance();
+		$this->assertInstanceOf('FreshVine\ExpiringMediaCache\ExpiringMediaCache', $sameExpiringMediaCache);
+		$this->assertSame($ExpiringMediaCache, $sameExpiringMediaCache);
+
+		$testExpiringMediaCache = TestExpiringMediaCache::instance('test late static binding');
+		$this->assertInstanceOf('TestExpiringMediaCache', $testExpiringMediaCache);
+
+		$sameInstanceAgain = TestExpiringMediaCache::instance('test late static binding');
+		$this->assertSame($testExpiringMediaCache, $sameInstanceAgain);
+	}
+
+
+
+	/**
+	 * This is here to ensure that we clean everything up after each run. Since this is a caching library having files lingering could screw up our results.
+	 */
+	public static function tearDownAfterClass(): void {
+		// We need to clean up the directories that we made
+
+		unset( $this->ExpiringMediaCache );
+
+
+		print "tearDownAfterClass" . PHP_EOL;
+
+		$TemporaryDirectories = array(
+			__DIR__ . '/media-cache/',
+			__DIR__ . '/another-cache/'
+		);
+
+		foreach( $TemporaryDirectories as $dir ){
+			if( !file_exists( $dir ) )
+				continue;
+
+			$files = array_diff(scandir($dir), array('.','..'));
+			foreach ($files as $file) {
+				unlink("$dir/$file");
+			}
+
+			rmdir( $dir );
+		}
 	}
 }
