@@ -14,11 +14,12 @@ Since PHP is a single threaded (and thus a blocking language) you will likely wa
   
 ## Features  
 
-*	Easily create a local repository of media.
-*	Remove old media when no longer used
-*	Quickly convert remote URLs into local URLs when already cached.
-*	Easy to integrate into your project
-*	Uses Javascript friendly timestamps for caching (ISO 8601).
+*	Easily create a local repository of media.  
+*	Remove old media when no longer used  
+*	Quickly convert remote URLs into local URLs when already cached.  
+*	Easy to integrate into your project  
+*	Cache Method and Lifetime are applied to each cached media  
+*	Uses Javascript friendly timestamps for caching (ISO 8601).  
 
 
 ## Adding to your Project  
@@ -29,7 +30,7 @@ Install the composer package:
 composer require FreshVine/ExpiringMediaCache
 ```
 
-The library will use a default directory and path for the cache unless you define a different one. The default directory is within the same directory as the library in a folder called `/media-cache/`. The library will also attempt to define the public URL to access this directory. It will only be sucessful in simple and direct server configurations (no advanced apache/ngnix mapping setups).
+The library will use a default directory and path for the cache unless you define a different one. The default directory is within the same directory as the library in a folder called `/media-cache/`. The library will also attempt to define the public URL to access this directory. It will only be successful in simple and direct server configurations (no advanced apache/ngnix mapping setups).
 
   
 ## Example Usage  
@@ -55,45 +56,45 @@ $ExpiringMedia->cleanUp();
 
 ## Configuration Options
 
-**CacheMethod**
-The method of caching determins how to apply the lifetime to a cached item. When set to 'first' the lifetime will be measured from when the item was first cached. When set to 'request' it will be measured against when it was last requested from the cache (not from the filesystem).
+### CacheMethod  
+The method of caching defines how to apply the lifetime to a cached item. When set to 'first' the lifetime will be measured from when the item was first cached. When set to 'request' it will be measured against when it was last requested from the cache (not from the filesystem). Note that this is stored with each cached item.
 
-Options: first, request
-Default: first
+**Options:** first, request  
+**Default:** first  
 
 		$ExpiringMedia->setCacheMethod( $cacheMethod );
 		$ExpiringMedia->getCacheMethod( );
 
-**Lifetime**
-The lifetime is the period of time in minutes that an item should remain in the cache. 
+### Lifetime  
+The lifetime is the period of time in minutes that an item should remain in the cache.   
 
-Default: 7 Days
+**Default:** 10080 Minutes (7 Days)  
 
 	$ExpiringMedia->setLifetime( 7 * 24 * 60 );
 	$ExpiringMedia->getLifetime();
 
-**LocalMediaPath**
-This allows you to define the location that the cache should exist. This directory must only be used for the media cache, as the cache will remove any unexpected files from the directory. When you define this path using the supplied local file system controller it will attemp to determine the public URL as well.
+### LocalMediaPath  
+This allows you to define the location that the cache should exist. This directory must only be used for the media cache, as the cache will remove any unexpected files from the directory. When you define this path using the supplied local file system controller it will attempt to determine the public URL as well.  
 
-Default: `__DIR__ . '/media-cache/'`
+**Default:** `__DIR__ . '/media-cache/'`  
 
 	$ExpiringMedia->setLocalMediaPath( __DIR__ . '/media-cache/' );
 	$ExpiringMedia->getLocalMediaPath( );
 
 
-**LocalPublicURL**
-Related to the LocalMediaPath - this is the public URL to the supplied media path. 
+### LocalPublicURL  
+Related to the LocalMediaPath - this is the public URL to the supplied media path.  
 
-Default: domain/vendor/freshvine/expiring-media-cache/media-cache/'
+**Default:** `YOURDOMAIN/vendor/freshvine/expiring-media-cache/media-cache/`  
 
 	$ExpiringMedia->setLocalPublicURL( 'http://localhost:8080/media-cache/' );
 	$ExpiringMedia->getLocalPublicURL( );
 
 
-**FileController**
-This library includes a file controller written for the local filesystem that PHP is installed on. You may need to extend the abstracted functions in the File controller to support a different storage location (like a CDN or other). You can use the `Controllers\FileLocal.php` to help you.
-
-Default: `FreshVine\ExpiringMediaCache\Controllers\FileLocal`
+### FileController  
+This library includes a file controller written for the local filesystem that PHP is installed on. You may need to extend the abstracted functions in the File controller to support a different storage location (like a CDN or other). You can use the `Controllers\FileLocal.php` to help you.  
+  
+**Default:** `FreshVine\ExpiringMediaCache\Controllers\FileLocal`  
 
 	$MyFileController = new FreshVine\ExpiringMediaCache\Controllers\FileLocal( $ExpiringMedia );
 	$ExpiringMedia->setFileController( $MyFileController );
