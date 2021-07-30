@@ -1,5 +1,6 @@
-/docker      export-ignore
-/test        export-ignore
+/docker                export-ignore
+/media-cache           export-ignore
+/test                  export-ignore
 /.dockerignore         export-ignore
 /.gitignore            export-ignore
 /.travis.yml           export-ignore
