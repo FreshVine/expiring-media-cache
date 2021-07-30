@@ -257,6 +257,18 @@ class ExpiringMediaCache{
 
 		return $parsed['host'] . $parsed['path'];
 	}
+
+
+	/**
+	 * Drop the current state of the cache and reload the cache from the json file
+	 *
+	 * @return boolean
+	 */
+	public function reloadCache(){
+		$this->mediaIndex = array();	// Dump the mediaIndex
+
+		return $this->CacheController->loadCache();
+	}
 	/*
 	 *	END: Primary Methods
 	 */
@@ -347,6 +359,10 @@ class ExpiringMediaCache{
 		if( $GeneratePublicURL ){
 			$this->generatePublicURL();
 		}
+
+
+		if( $this->cacheInstantiated )
+			$this->reloadCache();
 
 		return $this;
 	}

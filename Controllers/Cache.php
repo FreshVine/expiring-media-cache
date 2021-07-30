@@ -223,7 +223,7 @@ class Cache{
 	 *
 	 * @return boolean
 	 */
-	private function loadCache(){
+	public function loadCache(){
 		$cachedData = $this->getCache();
 
 		// Set the cache filesize
