@@ -359,6 +359,9 @@ class ExpiringMediaCache{
 		if( empty( $localPath ) )
 			return false;
 
+		if( get_class($this->FileController) !== "FreshVine\ExpiringMediaCache\Controllers\FileLocal" )
+			return false;
+
 		// Estimate the public URL to the media-cache directory
 		$urlProtocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https://' : 'http://';
 		if( stripos( $localPath, $_SERVER['DOCUMENT_ROOT'] ) !== 0 )
