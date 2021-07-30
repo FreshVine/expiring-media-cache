@@ -18,6 +18,9 @@ matrix:
 install:
   - composer install --prefer-dist --no-interaction --no-progress
 
+before_script:
+  - yes | pecl install imagick
+
 script:
   - vendor/bin/phpunit --version
   - vendor/bin/phpunit test || true

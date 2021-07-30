@@ -1,5 +1,12 @@
 FROM richarvey/nginx-php-fpm:1.10.3
 
+
+#Install imagemagick:
+ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions imagick
+
+
 COPY . .
 
 # Image config
