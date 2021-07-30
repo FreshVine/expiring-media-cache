@@ -163,6 +163,31 @@ class ExpiringMediaCacheTest extends TestCase{
 	}
 
 
+
+
+	/**
+	 * There should be no excess files or directories in the cache directory. We should ensure that the files which we place into this directory are removed when the destructor runs.
+	 */
+	function testExcessFiles(){
+		$OG_Filename = __DIR__ . '/images/ville-de-cannes.jpg';
+		$ExcessFilename = __DIR__ . '/media-cache/ville-de-cannes-extra-file.jpg';
+
+
+		if( !copy( $OG_Filename, $ExcessFilename ) ){
+			throw new Exception('ExpiringMediaCacheTest: Failed when coping a file into the media-cache directory.');
+		}
+
+
+		$this->ExpiringMediaCache->cleanUp();
+		$this->ExpiringMediaCache->writeCache();
+
+
+		$this->assertFileDoesNotExist( $ExcessFilename, 'Excess file remained after running the clean up' );
+		
+	}
+
+
+
 	public function testLateStaticBinding(){
 		$ExpiringMediaCache = ExpiringMediaCache::instance();
 		$this->assertInstanceOf('FreshVine\ExpiringMediaCache\ExpiringMediaCache', $ExpiringMediaCache);
