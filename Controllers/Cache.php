@@ -166,7 +166,7 @@ class Cache{
 	 * @param $CacheModel
 	 * @return boolean
 	 */
-	private function checkExpired( CacheModel &$CacheModel ){
+	public function checkExpired( CacheModel &$CacheModel ){
 		if( $CacheModel->isPermanent() ){
 			return false;	// This cannot expire
 		}
@@ -253,14 +253,6 @@ class Cache{
 		}
 
 		return true;
-	}
-
-
-	public function processExpired(){
-		// $this->expiredIndexes;
-
-
-		return $this;
 	}
 
 
