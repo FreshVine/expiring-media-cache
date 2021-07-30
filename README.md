@@ -43,7 +43,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $ExpiringMedia = new \FreshVine\ExpiringMediaCache\ExpiringMediaCache();
 
 // Get a local URL for cached media
-$Cached = $ExpiringMedia->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/');
+$Cached = $ExpiringMedia->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/rodin-thinker.jpg');
 $URL = $ExpiringMedia->getURL( $Cached );
 
 
