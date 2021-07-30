@@ -163,15 +163,42 @@ class ExpiringMediaCache{
 	 * @return Boolean
 	 */
 	public function cleanUp(){
-		// Remove any mediaIndex items that remain expired
+		$ExpectedFiles = array('cache' => '_media-cache.json');	// Key => Filename
+		
+
+		foreach( $this->mediaIndex as $k => $CacheObject ){
+			$FileShouldRemain = true;
+
+			// Remove any mediaIndex items where their related files do not exist
+			if( !$this->FileController->exists( $CacheObject->FileModel ) ){
+				$CacheObject->setFlag('removed', true );
+				$FileShouldRemain = false;
+			}else{
+				$CacheObject->setFlag('removed', false );	// cached items with a removed flag are not saved when the cache is written
+			}
 
 
+			// Remove any mediaIndex items that remain expired
+			if( $this->CacheController->checkExpired( $CacheObject ) ){
+				$CacheObject->setFlag('expired', true );
+				$FileShouldRemain = false;
+			}else{
+				$CacheObject->setFlag('expired', false );
+			}
 
-		// Remove any mediaIndex items where their related files do not exist
+			if( $FileShouldRemain )
+				$ExpectedFiles[$k] = $CacheObject->getCacheFilename();
+		}
 
 
 		// Remove any files from the cache directory which are not expected to be there
-
+		$LiveFiles = $this->FileController->listFiles();
+		$ExtraFiles = array_diff( $LiveFiles, $ExpectedFiles );
+		if( !empty( $ExtraFiles ) ){
+			foreach( $ExtraFiles as $filename ){
+				$this->FileController->fileDelete( $this->getLocalPath() . $filename );
+			}
+		}
 
 
 		return true;
