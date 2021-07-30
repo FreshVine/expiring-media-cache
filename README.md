@@ -3,22 +3,23 @@
 [![Total Downloads](https://poser.pugx.org/freshvine/expiringmediacache/d/total.svg)](https://packagist.org/packages/freshvine/expiringmediacache)
 [![Version](https://poser.pugx.org/freshvine/expiringmediacache/v/stable.svg)](https://packagist.org/packages/freshvine/expiringmediacache)
 [![License](https://poser.pugx.org/freshvine/expiringmediacache/license.svg)](https://packagist.org/packages/freshvine/expiringmediacache)  
-
-A simple way to cache media locally and remove it after it expires.  
-
-The core concept of this library is simple. It makes it simple to create local to you copies of accessible remote media. At the same time it creates and maintains an index of all the cached media. After a pre-determined period of time the local copies of media will expire, and be removed from your file system, and the index.
-
-This is idea for projects where you want to include temporary content from third party sources, but do not want to build up a large repository of old and irrelevant content you won't use in the future. 
-
+  
+A simple way to cache media locally and remove it once it has expired.  
+  
+The core concept of this library is simple. It creates local to you copies of accessible remote media. At the same time it creates and maintains an index of all the cached media. After a pre-determined period of time the local copies of media will expire, and be removed from your file system, and the index.  
+  
+This is ideal for projects where you want to include temporary content from third party sources, but do not want to build up a large repository of old and irrelevant content you won't use in the future.  
+  
 Since PHP is a single threaded (and thus a blocking language) you will likely want to process these media requests separately from your primary page load (via an XHR request on DOM Ready for example). This will greatly improve your load performance. However you can choose to implement this library in any way you see fit.  
   
 ## Features  
 
 *	Easily create a local repository of media.  
-*	Remove old media when no longer used  
+*	Remove old media when no longer used.  
 *	Quickly convert remote URLs into local URLs when already cached.  
-*	Easy to integrate into your project  
-*	Cache Method and Lifetime are applied to each cached media  
+*	Easy to integrate into your projects.  
+*	Cache Method and Lifetime are applied individually to cached media.  
+*	Simplify the management of temporal media content.
 *	Uses Javascript friendly timestamps for caching (ISO 8601).  
 
 
@@ -140,7 +141,7 @@ You are going to want the URL from the cache. This is the function that gets tha
 `$PublicURL = $ExpiringMedia->getURL( $ExpiringMedia->cacheThis() ); `  
 
 
-## reloadCache  
+### reloadCache  
 If you need to unload the state of the cache and load the cache from the JSON file again you call this function. This function is called when you change the LocalPath via `setLocalPath()`.
   
 **Returns** boolean  
