@@ -130,7 +130,9 @@ class ExpiringMediaCache{
 
 
 		// Write everytime we add to the cache
-		$this->CacheController->writeCache();
+		if( $this->getWriteEveryChange() ){
+			$this->CacheController->writeCache();
+		}
 
 		return $CacheObject;
 	}
@@ -206,7 +208,11 @@ class ExpiringMediaCache{
 			// Update the TimestampUTC to current - we must ensure this is done in the mediaIndex
 			$this->mediaIndex[$CacheModel->getRemoteURL()]->makeTimestampCurrent();
 			$this->mediaIndex[$CacheModel->getRemoteURL()]->setFlag('expired', false);	// Ensure that it is not marked as expired
-			
+
+
+			if( $this->getWriteEveryChange() ){
+				$this->CacheController->writeCache();
+			}
 		}
 
 		return $BaseURL . $CacheModel->getCacheFilename();
@@ -238,6 +244,7 @@ class ExpiringMediaCache{
 	protected	$CacheController;
 	protected	$FileController;
 	protected	$cacheInstantiated = false;		// Boolean: Has the cache been instantiated yet
+	protected	$writeEveryChange = false;		// Boolean: Do we write the cache once, or after every change.
 	protected	$mediaIndex = array();			// This is an associative array of the cache objects
 	private static $instances = array();
 
@@ -265,6 +272,9 @@ class ExpiringMediaCache{
 	}
 	public function getMediaIndex(){
 		return $this->mediaIndex;
+	}
+	public function getWriteEveryChange(){
+		return $this->WriteEveryChange;
 	}
 	/*
 	 *  END: Getters
@@ -317,6 +327,12 @@ class ExpiringMediaCache{
 
 	public function setLocalPublicURL( string $localPublicURL ){
 		$this->localPublicURL = $localPublicURL;
+
+		return $this;
+	}
+
+	public function setWriteEveryChange( bool $writeEveryChange ){
+		$this->writeEveryChange = $writeEveryChange;
 
 		return $this;
 	}
