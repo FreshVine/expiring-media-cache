@@ -59,10 +59,12 @@ class FileLocal extends FileController{
 	 * @param  FileModel		$File		This is the File model that holds the information about the file
 	 * @return boolean
 	 */
-	public function exists( FileModel $File ){
+	public function exists( FileModel &$File ){
 		$FullFilePath = $this->ExpiringMediaCache->getLocalPath() . $File->getFilename();
-		if( is_file( $FullFilePath ) !== true )
+		if( is_file( $FullFilePath ) !== true ){
+			$File->setStatus('unwritten');
 			return false;
+		}
 
 		return true;
 	}

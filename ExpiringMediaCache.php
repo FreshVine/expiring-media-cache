@@ -82,8 +82,9 @@ class ExpiringMediaCache{
 		// See if the item exists already in the cache
 		try{
 			$CacheObject = $this->find( $RemoteURL );
-			if( $CacheObject !== false )
-				return $CacheObject;	// Already cached, so no need to process further
+
+			if( $CacheObject !== false && $this->FileController->exists( $CacheObject->FileModel ))
+				return $CacheObject;	// Already cached and the file exists, so no need to process further
 		}catch( Exception $E){
 			echo 'Why is this not showing up';
 			// This is okay. it jsut means we keep going
@@ -111,7 +112,6 @@ class ExpiringMediaCache{
 		}
 
 
-
 		// Update the local caching filename
 		$CacheObject->FileModel->setFilename( $LocalFilename );
 		$this->FileController->uniqueFilename( $CacheObject->FileModel );
@@ -125,9 +125,6 @@ class ExpiringMediaCache{
 
 		// update the cache model now that the media is saved
 		$this->addToMediaIndex( $CacheObject );
-		// $this->mediaIndex[$CacheObject->getRemoteURL()] = $CacheObject;
-		ksort( $this->mediaIndex );
-
 
 		// Write everytime we add to the cache
 		if( $this->getWriteEveryChange() ){
@@ -194,9 +191,20 @@ class ExpiringMediaCache{
 		$LiveFiles = $this->FileController->listFiles();
 		$ExtraFiles = array_diff( $LiveFiles, $ExpectedFiles );		// Find what should not be there
 		$ExtraFiles = array_diff( $ExtraFiles, array('..', '.'));	// Ensure we don't have any weird directories
+
+		$FlippedLive = array_flip( $ExpectedFiles );	// This will help us ensure the files are marked as removed
+
+
 		if( !empty( $ExtraFiles ) ){
 			foreach( $ExtraFiles as $filename ){
 				$this->FileController->fileDelete( $this->getLocalPath() . $filename );
+
+
+				// Look through our index to ensure that the filx is marked as removed
+				if( array_key_exists( $filename, $FlippedLive ) ){
+					$Removed = $this->find( $filename );
+					$Removed->setFlag('removed', true );	// Ensure this is marked
+				}
 			}
 		}
 

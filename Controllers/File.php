@@ -161,7 +161,7 @@ abstract class File{
 	 * @param  FileModel		$File		This is the File model that holds the information about the file
 	 * @return boolean
 	 */
-	abstract public function exists( FileModel $File );
+	abstract public function exists( FileModel &$File );
 
 
 	/**

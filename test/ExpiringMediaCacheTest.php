@@ -98,6 +98,24 @@ class ExpiringMediaCacheTest extends TestCase{
 	}
 
 
+	/**
+	 * The purpose of this test is to see if we will refetch missing media if the user requests that media.
+	 */
+	function testRefetchMedia(){
+		// First Fetch
+		$Media = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'snowman-at-albright-visitor-center.jpg' );
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'snowman-at-albright-visitor-center.jpg');
+
+
+		unlink( $this->ExpiringMediaCache->getLocalPath() . 'snowman-at-albright-visitor-center.jpg' );	// Remove the Media Directly
+		$this->assertFileDoesNotExist( $this->ExpiringMediaCache->getLocalPath() . 'snowman-at-albright-visitor-center.jpg');
+
+
+		$MediaAgain = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'snowman-at-albright-visitor-center.jpg' );
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'snowman-at-albright-visitor-center.jpg');
+	}
+
+
 	public function testLateStaticBinding(){
 		$ExpiringMediaCache = ExpiringMediaCache::instance();
 		$this->assertInstanceOf('FreshVine\ExpiringMediaCache\ExpiringMediaCache', $ExpiringMediaCache);
