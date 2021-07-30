@@ -43,15 +43,18 @@ class ExpiringMediaCacheTest extends TestCase{
 	 * Ensure that the images are cached, and that the images match those from the remote server
 	 */
 	function testBasicImages(){
+		$Media = array();
 		try{
-			$Media = array();
 			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'Northern_Hemisphere_Snow_Cover_Graph.png');	// PNG
 			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'chapel-cluny-museum.jpg');	// JPG
 			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'Dipole_xmting_antenna_animation.gif');	// GIF
 			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'beaver.svg');	// SVG
 		}catch( Exception $e ){
-			throw new $e;
+			$this->assertFalse(true, 'Failed to cache Media');
 		}
+
+
+		$this->ExpiringMediaCache->writeCache();
 
 
 		// Ensure that the files were cached
@@ -75,6 +78,7 @@ class ExpiringMediaCacheTest extends TestCase{
 		$Media['lucy'] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . '02/copy-test.jpg?match=lucy' );
 		$Media['cannes'] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . '03/copy-test.jpg?match=cannes' );
 
+		$this->ExpiringMediaCache->writeCache();
 
 		// Ensure that the media were cached with the right file names now exist
 		$this->assertEquals( $Media['cluny']->getCacheFilename(), 'copy-test.jpg', "Cache Filename does not match expectation");
