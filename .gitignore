@@ -1,3 +1,5 @@
 composer.lock
+media-cache/
+test/media-cache/
 vendor/
 *.DS_Store
