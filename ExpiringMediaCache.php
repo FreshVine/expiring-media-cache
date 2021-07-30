@@ -338,7 +338,7 @@ class ExpiringMediaCache{
 		}
 
 		if( !file_exists( $localPath ) && $CreateIfNotExists ){
-			mkdir( $localPath );
+			$this->FileController->makeDirectory( $localPath );
 		}
 
 		$this->CacheController->setLocalPath( $localPath );
@@ -378,7 +378,10 @@ class ExpiringMediaCache{
 	protected function instantiateCache(){
 		if( $this->cacheInstantiated == true )
 			return true;
-		
+
+		$this->FileController->makeDirectory( $this->getLocalPath() );
+
+
 		$CacheStatus = $this->CacheController->instantiateCache();
 
 		if( $CacheStatus === false ){

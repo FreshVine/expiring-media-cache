@@ -21,12 +21,33 @@ use FreshVine\ExpiringMediaCache\Models\File as FileModel;
 
 class FileLocal extends FileController{
 	/**
+	 * Creates the directory for the given absolute path
+	 *
+	 * @return boolean
+	 */
+	public function makeDirectory( string $DirectoryPath ){
+		if( is_dir( $DirectoryPath ) )
+			return false;
+
+		if( file_exists( $DirectoryPath ) )
+			return true;
+
+		$Response = mkdir( $DirectoryPath, 0777, true );
+
+		return $Response;
+	}
+
+
+	/**
 	 * Returns a list of all the files in the given media cache directory
 	 *
 	 * @return array
 	 */
 	public function listFiles(){
-		$Response = array_diff(scandir($this->ExpiringMediaCache->getLocalPath()), array('..', '.'));
+		if( !file_exists( $this->ExpiringMediaCache->getLocalPath() ) )
+			return array();
+		
+		$Response = array_diff(scandir( $this->ExpiringMediaCache->getLocalPath() ), array('..', '.'));
 
 		return $Response;
 	}

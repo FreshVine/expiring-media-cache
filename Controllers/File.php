@@ -140,6 +140,14 @@ abstract class File{
 
 
 	/**
+	 * Creates the directory for the given absolute path
+	 *
+	 * @return boolean
+	 */
+	abstract protected function makeDirectory( string $DirectoryPath );
+
+
+	/**
 	 * Returns a list of all the files in the given media cache directory
 	 *
 	 * @return array
