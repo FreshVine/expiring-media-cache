@@ -315,7 +315,7 @@ class ExpiringMediaCache{
 		return $this;
 	}
 
-	public function setlocalPublicURL(string $localPublicURL ){
+	public function setLocalPublicURL( string $localPublicURL ){
 		$this->localPublicURL = $localPublicURL;
 
 		return $this;
