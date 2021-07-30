@@ -193,17 +193,6 @@ class ExpiringMediaCache{
 
 
 	/**
-	 * Determins if the supplied file exists or not
-	 *
-	 * @param  FileModel		$File		This is the File model that holds the information about the file
-	 * @return boolean
-	 */
-	public function exists( FileModel $File ){
-		return $this->FileController->exists( $File );
-	}
-
-
-	/**
 	 * Return the public URL for a given cache model
 	 *
 	 * @param  string		$RemoteURL	The remote URL
@@ -398,9 +387,13 @@ class ExpiringMediaCache{
 	}
 
 
+
 	/*
 	 * Passthrough methods
 	 */
+	public function exists( FileModel $File ){
+		return $this->FileController->exists( $File );
+	}
 	public function fileExists( string $filename ){
 		return $this->FileController->fileExists( $filename );
 	}
@@ -413,6 +406,9 @@ class ExpiringMediaCache{
 	public function fileWrite( string $filename, string $content ){
 		return $this->FileController->fileWrite( $filename, $content );
 	}
+	/*
+	 * END: Passthrough methods
+	 */
 
 
 
