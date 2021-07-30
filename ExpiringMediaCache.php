@@ -460,6 +460,9 @@ class ExpiringMediaCache{
 	public function fileWrite( string $filename, string $content ){
 		return $this->FileController->fileWrite( $filename, $content );
 	}
+	public function writeCache(){
+		$this->CacheController->writeCache();
+	}
 	/*
 	 * END: Passthrough methods
 	 */
