@@ -184,21 +184,30 @@ abstract class File{
 
 
 	/**
-	 * Return the content from the supplied filename
-	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
-	 * @return string
-	 */
-	abstract public function fileRead( string $FullFilePath );
-
-
-	/**
 	 * Determins if the supplied filename or path exists
 	 *
 	 * @param  string			$FullFilePath		This is the absolute path to check for
 	 * @return boolean
 	 */
 	abstract public function fileExists( string $FullFilePath );
+
+
+	/**
+	 * Deletes the supplied filename or path exists
+	 *
+	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @return boolean
+	 */
+	abstract public function fileDelete( string $FullFilePath );
+
+
+	/**
+	 * Return the content from the supplied filename
+	 *
+	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @return string
+	 */
+	abstract public function fileRead( string $FullFilePath );
 
 
 	/**

@@ -125,20 +125,6 @@ class FileLocal extends FileController{
 
 
 	/**
-	 * Return the content from the supplied filename
-	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
-	 * @return string
-	 */
-	public function fileRead( string $FullFilePath ){
-		if( !$this->fileExists( $FullFilePath ) )
-			return NULL;
-
-		return file_get_contents( $FullFilePath );
-	}
-
-
-	/**
 	 * Determins if the supplied filename or path exists
 	 *
 	 * @param  string			$FullFilePath		This is the absolute path to check for
@@ -149,6 +135,41 @@ class FileLocal extends FileController{
 			return false;
 
 		return true;
+	}
+
+
+	/**
+	 * Deletes the supplied filename or path exists
+	 *
+	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @return boolean
+	 */
+	public function fileDelete( string $FullFilePath ){
+		if( $this->fileExists( $FullFilePath ) == false ){
+			false
+		}
+
+		
+		$Success = unlink( $FullFilePath );
+		if( $Success === false ){
+			false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Return the content from the supplied filename
+	 *
+	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @return string
+	 */
+	public function fileRead( string $FullFilePath ){
+		if( !$this->fileExists( $FullFilePath ) )
+			return NULL;
+
+		return file_get_contents( $FullFilePath );
 	}
 
 
