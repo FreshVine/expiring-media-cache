@@ -300,13 +300,13 @@ class ExpiringMediaCache{
 		return $this;
 	}
 
-	public function setLifetime(int $Lifetime){
+	public function setLifetime( int $Lifetime){
 		$this->CacheController->setLifetime( $Lifetime );
 
 		return $this;
 	}
 
-	public function setLocalPath(string $localPath, bool $GeneratePublicURL = false, bool $CreateIfNotExists = true ){
+	public function setLocalPath( string $localPath, bool $GeneratePublicURL = false, bool $CreateIfNotExists = true ){
 		if( substr( $localPath , -1 ) != '/' ){
 			$localPath .= '/';	// Ensure that it has a trailing slash
 		}
