@@ -100,6 +100,9 @@ class Cache{
 		if( $this->isCached === false && $this->isPermanent === false ){
 			return null;	// It is not in the cache, and it is was not moved to permanent storage
 		}
+		if( $this->isExpired === true ){
+			return null;	// Expired media is not stored in the cache
+		}
 		if( $this->isRemoved === true ){
 			return null;	// Deleted media is removed from the cache
 		}
