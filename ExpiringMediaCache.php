@@ -286,7 +286,6 @@ class ExpiringMediaCache{
 	protected	$mediaIndex = array();			// This is an associative array of the cache objects
 	private static $instances = array();
 
-	protected	$expiredIndexes = array();		// This is an array holding the indexes of cached objects which have expired
 	protected	$localPublicURL;				// This is the URL for the localMediaPath.
 	protected	$prefexFilename = false;
 

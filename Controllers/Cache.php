@@ -189,9 +189,6 @@ class Cache{
 		// Mark object as expired
 		$CacheModel->setFlag('expired', true);
 
-		// Add remoteURL to index to expire out
-		$this->expiredIndexes[] = $CacheModel->getRemoteURL();
-
 		return true;
 	}
 
@@ -234,7 +231,7 @@ class Cache{
 			foreach( $cachedData['media'] as $remoteURL => $vars ){
 				// Create  the objects and load them into the
 				$thisObject = new CacheModel( $remoteURL, $vars );
-					$thisObject->setFlag('cached', true);
+				$thisObject->setFlag('cached', true);
 
 				// Check if the file exists
 				if( $this->ExpiringMediaCache->exists( $thisObject->FileModel ) === false ){
@@ -246,8 +243,6 @@ class Cache{
 					$thisObject->setFlag('expired', true);
 				}
 
-
-				$thisObject->setFlag('cached', true);
 				$this->ExpiringMediaCache->addToMediaIndex( $thisObject );
 			}
 		}
