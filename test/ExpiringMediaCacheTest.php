@@ -1,67 +1,68 @@
 <?php
 
+
 use PHPUnit\Framework\TestCase;
+use Lupka\PHPUnitCompareImages\CompareImagesTrait;
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
 
-class ExpiringMediaCacheTest extends TestCase
-{
-    final function __construct($name = null, array $data = array(), $dataName = '')
-    {
-        $this->dirs = $this->initDirs();
-        $this->ExpiringMediaCache = $this->initExpiringMediaCache();
 
-        parent::__construct($name, $data, $dataName);
-    }
+class ExpiringMediaCacheTest extends TestCase{
+	use CompareImagesTrait;
 
-    private $dirs;
-    protected $ExpiringMediaCache;
+	final function __construct($name = null, array $data = array(), $dataName = ''){
+		$this->dirs = $this->initDirs();
+		$this->ExpiringMediaCache = $this->initExpiringMediaCache();
 
-    /**
-     * @return array
-     */
-    protected function initDirs()
-    {
-        $dirs []= dirname(__FILE__).'/data/';
+		parent::__construct($name, $data, $dataName);
+	}
 
-        return $dirs;
-    }
+	private $dirs;
+	protected $ExpiringMediaCache;
 
-    /**
-     * @return ExpiringMediaCache
-     */
-    protected function initExpiringMediaCache()
-    {
-        $ExpiringMediaCache = new TestExpiringMediaCache();
-        return $ExpiringMediaCache;
-    }
+	/**
+	 * @return array
+	 */
+	protected function initDirs(){
+		$dirs []=  __DIR__ . '/images/';
 
-    /**
-     * @dataProvider data
-     * @param $test
-     * @param $dir
-     */
-    function test_($test, $dir)
-    {
-    }
+		return $dirs;
+	}
 
-    function testRawHtml()
-    {
-    }
+	/**
+	 * @return ExpiringMediaCache
+	 */
+	protected function initExpiringMediaCache(){
+		$ExpiringMediaCache = new TestExpiringMediaCache( rtrim( __DIR__, '/' ) . '/media-cache/' );
 
-    function testTrustDelegatedRawHtml()
-    {
-    }
+		return $ExpiringMediaCache;
+	}
 
-    function data()
-    {
-        $data = array();
-        }
 
-        return $data;
-    }
+	/**
+	 * Ensure that the images are cached, and that the images match those from the remote server
+	 */
+	function testBasicImages(){
+		try{
+			$Media = array();
+			$Media[] = $this->ExpiringMediaCache->cacheThis('https://raw.githubusercontent.com/FreshVine/expiring-media-cache/main/test/images/Northern_Hemisphere_Snow_Cover_Graph.png');	// PNG
+			$Media[] = $this->ExpiringMediaCache->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/chapel-cluny-museum.jpg');	// JPG
+			$Media[] = $this->ExpiringMediaCache->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/Dipole_xmting_antenna_animation.gif');	// GIF
+			$Media[] = $this->ExpiringMediaCache->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/beaver.svg');	// SVG
+		}catch( Exceptions $e ){
+			
+		} 
 
-    public function testLateStaticBinding()
-    {
-        $ExpiringMediaCache = ExpiringMediaCache::instance();
-    }
+
+		// Ensure that the files were cached
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'Northern_Hemisphere_Snow_Cover_Graph.png', 'Media Image did not cache - PNG');
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'chapel-cluny-museum.jpg', 'Media Image did not cache - JPG');
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'Dipole_xmting_antenna_animation.gif', 'Media Image did not cache - GIF');
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'beaver.svg', 'Media Image did not cache - SVG');
+
+
+		// Ensure that the files were the same as the remote ones
+		$this->assertImagesSame( $this->ExpiringMediaCache->getLocalPath() . 'chapel-cluny-museum.jpg', __DIR__ . '/images/chapel-cluny-museum.jpg' );
+	}
+
+	}
 }
