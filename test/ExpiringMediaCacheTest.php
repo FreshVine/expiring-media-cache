@@ -166,6 +166,52 @@ class ExpiringMediaCacheTest extends TestCase{
 
 
 	/**
+	 * Check what happens to media when it has expired. Expired media should be removed from the cache file, and related media should be removed
+	 */
+	function testExpiredMedia(){
+		/**
+		 *  Media that is expired should be removed if it is not requested during this instance.
+		 */
+		// Load a sample image
+		$Sample = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'great-gallery-of-evolution.jpg' );
+
+		$this->assertFileExists( $this->ExpiringMediaCache->getLocalPath() . 'great-gallery-of-evolution.jpg');
+		$RemoteURL = $Sample->getRemoteURL();
+		$this->assertFalse( $Sample->isExpired() );		// Ensure that is was false when it was cached
+
+		// Write the cache to the JSON file
+		$this->ExpiringMediaCache->writeCache();
+
+	
+		// Access the contents of the JSON file, Set the timestamp back 1000 years (it's easy)
+		$contents = json_decode( file_get_contents( $this->ExpiringMediaCache->getLocalPath() . '_media-cache.json' ), true );
+		$contents['media'][$RemoteURL]['Timestamp'] = '1' . substr( $contents['media'][$RemoteURL]['Timestamp'], 1 );
+
+		file_put_contents( $this->ExpiringMediaCache->getLocalPath() . '_media-cache.json', json_encode( $contents, JSON_UNESCAPED_UNICODE ) );
+
+
+		// Loading the cache again  from the JSON file will mark the media as expired
+		$this->ExpiringMediaCache->reloadCache();
+		$SampleExpired = $this->ExpiringMediaCache->find( $RemoteURL );	// Find the same media from before
+		$this->assertTrue( $SampleExpired->isExpired() );	// Ensure that it is now expired
+
+
+		$this->ExpiringMediaCache->cleanUp();	// This should remove any expired media images.
+		$this->assertFileDoesNotExist( $this->ExpiringMediaCache->getLocalPath() . 'great-gallery-of-evolution.jpg', 'Expired file remained after clean up' );
+
+
+
+		// Write the cache to the JSON file
+		$this->ExpiringMediaCache->writeCache();
+
+		// Check that the expired media was not included
+		$ExpiredContents = json_decode( file_get_contents( $this->ExpiringMediaCache->getLocalPath() . '_media-cache.json' ), true );
+		$this->assertFalse( array_key_exists( $RemoteURL, $ExpiredContents['media'] ), 'Cache included an entry for expired media');
+
+	}
+
+
+	/**
 	 * There should be no excess files or directories in the cache directory. We should ensure that the files which we place into this directory are removed when the destructor runs.
 	 */
 	function testExcessFiles(){
@@ -248,8 +294,8 @@ class ExpiringMediaCacheTest extends TestCase{
 			foreach ($files as $file) {
 				unlink("$dir/$file");
 			}
-
-			// rmdir( $dir );
 		}
+
+		return;
 	}
 }
