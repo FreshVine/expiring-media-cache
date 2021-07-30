@@ -18,6 +18,7 @@ class ExpiringMediaCacheTest extends TestCase{
 
 	private $dirs;
 	protected $ExpiringMediaCache;
+	const GithubRawURL = 'https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/';
 
 	/**
 	 * @return array
@@ -44,13 +45,13 @@ class ExpiringMediaCacheTest extends TestCase{
 	function testBasicImages(){
 		try{
 			$Media = array();
-			$Media[] = $this->ExpiringMediaCache->cacheThis('https://raw.githubusercontent.com/FreshVine/expiring-media-cache/main/test/images/Northern_Hemisphere_Snow_Cover_Graph.png');	// PNG
-			$Media[] = $this->ExpiringMediaCache->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/chapel-cluny-museum.jpg');	// JPG
-			$Media[] = $this->ExpiringMediaCache->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/Dipole_xmting_antenna_animation.gif');	// GIF
-			$Media[] = $this->ExpiringMediaCache->cacheThis('https://github.com/FreshVine/expiring-media-cache/raw/main/test/images/beaver.svg');	// SVG
-		}catch( Exceptions $e ){
-			
-		} 
+			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'Northern_Hemisphere_Snow_Cover_Graph.png');	// PNG
+			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'chapel-cluny-museum.jpg');	// JPG
+			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'Dipole_xmting_antenna_animation.gif');	// GIF
+			$Media[] = $this->ExpiringMediaCache->cacheThis( ExpiringMediaCacheTest::GithubRawURL . 'beaver.svg');	// SVG
+		}catch( Exception $e ){
+			throw new $e;
+		}
 
 
 		// Ensure that the files were cached
