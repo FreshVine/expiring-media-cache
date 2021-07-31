@@ -163,6 +163,34 @@ class ExpiringMediaCacheTest extends TestCase{
 	}
 
 
+	/**
+	 * The purpose of this test is to ensure that media from Instagram can be cached
+	 */
+	function testInstagramCache(){
+		// 
+		$InstaScraper = new InstagramScraper();	// This is for testing
+
+		// $InstagramTest = array();
+		//
+		// // Instagram First Source - Studlagil Canyon, Iceland - https://www.instagram.com/p/CM-GBiNs1PW/
+		// $InstagramTest[] = $InstaScraper->getMediaPaths('https://www.instagram.com/p/CM-GBiNs1PW/');
+		//
+		// // Instagram Second Source - Mont Saint Michel - https://www.instagram.com/p/CL19xB_M7Wv/
+		// $InstagramTest[] = $InstaScraper->getMediaPaths('https://www.instagram.com/p/CL19xB_M7Wv/');
+		//
+		// // Instagram Third Source - Walakiri Beach - https://www.instagram.com/p/B1l-QNhCCR7/
+		// $InstagramTest[] = $InstaScraper->getMediaPaths('https://www.instagram.com/p/B1l-QNhCCR7/');
+		//
+		// // Instagram Video First Source - Henrik and Aurora - https://www.instagram.com/p/B_YM-DlA7Zc/ [video/mp4]
+		// $InstagramTest[] = $InstaScraper->getMediaPaths('https://www.instagram.com/p/B_YM-DlA7Zc/');
+		//
+		// foreach( $InstagramTest as $vars ){
+		// 	foreach( $vars as $k => $v ){
+		// 		var_dump( $v, $this->ExpiringMediaCache->cacheThis($v, 'testprefix', $k ) );
+		// 	}
+		// }
+	}
+
 
 
 	/**
@@ -282,22 +310,24 @@ class ExpiringMediaCacheTest extends TestCase{
 	 * This is here to ensure that we clean everything up after each run. Since this is a caching library having files lingering could screw up our results.
 	 */
 	public static function setUpBeforeClass(): void {
-		$TemporaryDirectories = array(
-			__DIR__ . '/media-cache/',
-			__DIR__ . '/another-cache/'
-		);
-
-		foreach( $TemporaryDirectories as $dir ){
-			if( !file_exists( $dir ) )
-				continue;
-
-			$files = array_diff(scandir($dir), array('.','..'));
-			foreach ($files as $file) {
-				unlink("$dir/$file");
-			}
-
-			rmdir( $dir );
-		}
+		// $TemporaryDirectories = array(
+		// 	__DIR__ . '/media-cache/',
+		// 	__DIR__ . '/another-cache/'
+		// );
+		//
+		// foreach( $TemporaryDirectories as $dir ){
+		// 	if( !file_exists( $dir ) )
+		// 		continue;
+		//
+		// 	$files = array_diff(scandir($dir), array('.','..'));
+		// 	foreach ($files as $file) {
+		// 		unlink("$dir/$file");
+		// 	}
+		//
+		// 	// rmdir( $dir );
+		// }
+		//
+		// return;
 	}
 
 
