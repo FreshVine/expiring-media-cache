@@ -210,6 +210,31 @@ class ExpiringMediaCacheTest extends TestCase{
 
 	}
 
+	/**
+	 *  Media that is expired but requested should have its timestamp updated.
+	 */
+	function testExpiredMediaRequested(){
+		
+	}
+
+
+
+	/**
+	 *  Test that the two cache methods act as expected. First only updates the timestamp when first requested, where request updates every request.
+	 */
+	function testCacheMethods(){
+		
+	}
+
+	/**
+	 * The purpose of this test is to ensure that media from Instagram can be cached
+	 */
+	function testMissingFiles(){
+		// If media files are removed from the file system the next time the cache loads it should see these have gone, and remove them from the cache, or attempt to refetch the file if requested during this instance.
+
+
+	}
+
 
 	/**
 	 * There should be no excess files or directories in the cache directory. We should ensure that the files which we place into this directory are removed when the destructor runs.
