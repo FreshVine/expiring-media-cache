@@ -194,45 +194,46 @@ abstract class File{
 	/**
 	 * Determins if the supplied filename or path exists
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return boolean
 	 */
-	abstract public function fileExists( string $FullFilePath );
+	abstract public function fileExists( string $Filename );
 
 
 	/**
 	 * Deletes the supplied filename or path exists
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return boolean
 	 */
-	abstract public function fileDelete( string $FullFilePath );
+	abstract public function fileDelete( string $Filename );
 
 
 	/**
 	 * Return the content from the supplied filename
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return string
 	 */
-	abstract public function fileRead( string $FullFilePath );
+	abstract public function fileRead( string $Filename );
 
 
 	/**
 	 * Returns the size of the file in bytes from the filesystem
 	 *
-	 * @param  FileModel		$File		This is the File model that holds the information about the file
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return int
 	 */
-	abstract public function fileSize( string $FullFilePath );
+	abstract public function fileSize( string $Filename );
 
 
 	/**
 	 * Write the given content to the given filename
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
+	 * @param  string			$Content		The content that should be written to the file (not appended, will overwrite existing content)
 	 * @return boolean
 	 */
-	abstract public function fileWrite( string $FullFilePath, string $Content );
+	abstract public function fileWrite( string $Filename, string $Content );
 }
 ?>

@@ -160,7 +160,7 @@ class ExpiringMediaCache{
 	 * @return Boolean
 	 */
 	public function cleanUp(){
-		$ExpectedFiles = array('cache' => '_media-cache.json');	// Key => Filename
+		$ExpectedFiles = array('cache' => $this->CacheController->getCacheFilename() );	// Key => Filename
 
 		foreach( $this->mediaIndex as $k => $CacheObject ){
 			$FileShouldRemain = true;
@@ -197,7 +197,7 @@ class ExpiringMediaCache{
 
 		if( !empty( $ExtraFiles ) ){
 			foreach( $ExtraFiles as $filename ){
-				$this->FileController->fileDelete( $this->getLocalPath() . $filename );
+				$this->FileController->fileDelete( $filename );
 
 
 				// Look through our index to ensure that the filx is marked as removed

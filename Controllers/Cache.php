@@ -36,7 +36,7 @@ class Cache{
 	 */
 	public function instantiateCache(){
 		// Set the cache file location
-		$cacheFilePath = $this->getLocalPath() . '_media-cache.json';
+		$cacheFilePath = $this->getLocalPath() . $this->getCacheFilename();
 		$this->setCacheFilePath( $cacheFilePath );
 
 		if( !file_exists( $cacheFilePath ) ){
@@ -63,6 +63,7 @@ class Cache{
 	 */
 	private		$ExpiringMediaCache;			// A passed instance of the instantiator of this class
 	protected	$localPath;						// The absolute path to where the media and cache should be stored
+	private		$cacheFilename = '_media-cache.json';		// The filename for the cache
 	private		$cacheFilePath;					// The absolute path to the cache json file
 	private		$cacheInBytes;
 	
@@ -76,6 +77,9 @@ class Cache{
 	 */
 	function getLocalPath(){
 		return $this->localPath;
+	}
+	function getCacheFilename(){
+		return $this->cacheFilename;
 	}
 	function getCacheFilePath(){
 		return $this->cacheFilePath;
@@ -200,15 +204,15 @@ class Cache{
 	 */
 	private function getCache(){
 		// Cache file has already been confirmed to exist.
-		$rawCacheData = $this->ExpiringMediaCache->fileRead( $this->getCacheFilePath() );
+		$rawCacheData = $this->ExpiringMediaCache->fileRead( $this->getCacheFilename() );
 		if( empty( $rawCacheData ) ){
-			throw new \Exception('ExpiringMediaCache: Attempted to load the cache but the file is empty - ' . $cacheFilePath );
+			throw new \Exception('ExpiringMediaCache: Attempted to load the cache but the file is empty - ' . $this->getCacheFilePath() );
 		}
 
 		// Ensure that this file is a valid JSON format
 		$cachedData = json_decode( $rawCacheData, true );
 		if( empty( $cachedData ) || !array_key_exists('media', $cachedData) ){
-			throw new \Exception('ExpiringMediaCache: The existing cache contains invalid JSON - ' . $cacheFilePath );
+			throw new \Exception('ExpiringMediaCache: The existing cache contains invalid JSON - ' . $this->getCacheFilePath() );
 		}
 
 		return $cachedData;
@@ -224,7 +228,7 @@ class Cache{
 		$cachedData = $this->getCache();
 
 		// Set the cache filesize
-		$this->setCacheInBytes( $this->ExpiringMediaCache->fileSize( $this->getCacheFilePath() ) );
+		$this->setCacheInBytes( $this->ExpiringMediaCache->fileSize( $this->getCacheFilename() ) );
 
 
 		if( !empty(  $cachedData['media'] ) ){
@@ -286,7 +290,7 @@ class Cache{
 		}
 
 		// Check if any of the data has updated
-		if( $this->ExpiringMediaCache->fileExists( $this->getCacheFilePath() ) ){
+		if( $this->ExpiringMediaCache->fileExists( $this->getCacheFilename() ) ){
 			$previousCache = $this->getCache();
 
 			if( $cacheData['libraryVersion'] == $previousCache['libraryVersion'] 
@@ -299,14 +303,14 @@ class Cache{
 
 
 		// Set the cache size in bytes
-		$success = $this->ExpiringMediaCache->fileWrite( $this->getCacheFilePath(), json_encode( $cacheData, JSON_UNESCAPED_UNICODE ) );
+		$success = $this->ExpiringMediaCache->fileWrite( $this->getCacheFilename(), json_encode( $cacheData, JSON_UNESCAPED_UNICODE ) );
 		if( $success === false ){
-			throw new \Exception('ExpiringMediaCache: Failed to write the cache to location: ' . $cacheFilePath );
+			throw new \Exception('ExpiringMediaCache: Failed to write the cache to location: ' . $this->getCacheFilePath() );
 		}
 
-		$cacheInBytes = $this->ExpiringMediaCache->fileSize( $this->getCacheFilePath() );
+		$cacheInBytes = $this->ExpiringMediaCache->fileSize( $this->getCacheFilename() );
 		if( $cacheInBytes == false ){
-			throw new \Exception('ExpiringMediaCache: Written cache file has no filesize: ' . $cacheFilePath );
+			throw new \Exception('ExpiringMediaCache: Written cache file has no filesize: ' . $this->getCacheFilePath() );
 		}
 		$this->setCacheInBytes( $cacheInBytes );
 

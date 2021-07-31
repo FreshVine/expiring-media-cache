@@ -150,10 +150,12 @@ class FileLocal extends FileController{
 	/**
 	 * Determins if the supplied filename or path exists
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return boolean
 	 */
-	public function fileExists( string $FullFilePath ){
+	public function fileExists( string $Filename ){
+		$FullFilePath = $this->ExpiringMediaCache->getLocalPath() . $Filename;
+
 		if( is_file( $FullFilePath ) !== true )
 			return false;
 
@@ -164,11 +166,13 @@ class FileLocal extends FileController{
 	/**
 	 * Deletes the supplied filename or path exists
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return boolean
 	 */
-	public function fileDelete( string $FullFilePath ){
-		if( $this->fileExists( $FullFilePath ) == false ){
+	public function fileDelete( string $Filename ){
+		$FullFilePath = $this->ExpiringMediaCache->getLocalPath() . $Filename;
+
+		if( $this->fileExists( $Filename ) == false ){
 			return false;
 		}
 
@@ -185,11 +189,13 @@ class FileLocal extends FileController{
 	/**
 	 * Return the content from the supplied filename
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return string
 	 */
-	public function fileRead( string $FullFilePath ){
-		if( !$this->fileExists( $FullFilePath ) )
+	public function fileRead( string $Filename ){
+		$FullFilePath = $this->ExpiringMediaCache->getLocalPath() . $Filename;
+
+		if( !$this->fileExists( $Filename ) )
 			return NULL;
 
 		return file_get_contents( $FullFilePath );
@@ -199,11 +205,13 @@ class FileLocal extends FileController{
 	/**
 	 * Determins if the supplied filename or path exists
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
 	 * @return int
 	 */
-	public function fileSize( string $FullFilePath ){
-		if( $this->fileExists( $FullFilePath ) !== true )
+	public function fileSize( string $Filename ){
+		$FullFilePath = $this->ExpiringMediaCache->getLocalPath() . $Filename;
+
+		if( $this->fileExists( $Filename ) !== true )
 			return 0;
 
 		return filesize( $FullFilePath );
@@ -213,10 +221,13 @@ class FileLocal extends FileController{
 	/**
 	 * Write the given content to the given filename
 	 *
-	 * @param  string			$FullFilePath		This is the absolute path to check for
+	 * @param  string			$Filename		This is the filename in the cache directory to check for
+	 * @param  string			$Content		The content that should be written to the file (not appended, will overwrite existing content)
 	 * @return boolean
 	 */
-	public function fileWrite( string $FullFilePath, string $Content ){
+	public function fileWrite( string $Filename, string $Content ){
+		$FullFilePath = $this->ExpiringMediaCache->getLocalPath() . $Filename;
+
 		// Attempt to write the file
 		$Filesize = file_put_contents( $FullFilePath, $Content );
 		if( $Filesize === false ){
