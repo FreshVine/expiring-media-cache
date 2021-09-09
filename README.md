@@ -1,5 +1,5 @@
 # Expiring Media Cache in PHP
-[![Build Status](https://travis-ci.com/FreshVine/expiring-media-cache.svg)](https://travis-ci.com/FreshVine/expiring-media-cache)
+[![Build Status](https://api.travis-ci.com/FreshVine/expiring-media-cache.svg)](https://app.travis-ci.com/github/FreshVine/expiring-media-cache)
 [![Total Downloads](https://poser.pugx.org/freshvine/expiringmediacache/d/total.svg)](https://packagist.org/packages/freshvine/expiringmediacache)
 [![Version](https://poser.pugx.org/freshvine/expiringmediacache/v/stable.svg)](https://packagist.org/packages/freshvine/expiringmediacache)
 [![License](https://poser.pugx.org/freshvine/expiringmediacache/license.svg)](https://packagist.org/packages/freshvine/expiringmediacache)  
