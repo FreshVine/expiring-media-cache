@@ -16,12 +16,12 @@
 namespace FreshVine\ExpiringMediaCache\Models;
 
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
-use FreshVine\ExpiringMediaCache\Controllers\File;
-use FreshVine\ExpiringMediaCache\Models\File as FileModel;
+use FreshVine\ExpiringMediaCache\Controllers\FileController;
+use FreshVine\ExpiringMediaCache\Models\FileModel as FileModel;
 use DateTime;
 use DateTimeZone;
 
-class Cache{
+class CacheModel{
 	/* -- Cache Members -- */
 	public $FileModel;			// Generated
 	protected $RemoteURL;		// Required

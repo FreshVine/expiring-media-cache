@@ -14,11 +14,11 @@
 
 namespace FreshVine\ExpiringMediaCache;
 
-use FreshVine\ExpiringMediaCache\Controllers\Cache;
-use FreshVine\ExpiringMediaCache\Controllers\File;
-use FreshVine\ExpiringMediaCache\Controllers\FileLocal;
-use FreshVine\ExpiringMediaCache\Models\Cache as CacheModel;
-use FreshVine\ExpiringMediaCache\Models\File as FileModel;
+use FreshVine\ExpiringMediaCache\Controllers\CacheController;
+use FreshVine\ExpiringMediaCache\Controllers\FileController;
+use FreshVine\ExpiringMediaCache\Controllers\FileLocalController;
+use FreshVine\ExpiringMediaCache\Models\CacheModel;
+use FreshVine\ExpiringMediaCache\Models\FileModel;
 use DateTimeZone;
 
 class ExpiringMediaCache{
@@ -30,8 +30,8 @@ class ExpiringMediaCache{
 
 
 	function __construct( $localPath = NULL, $localPublicURL = NULL){
-		$this->setFileController( new Controllers\FileLocal( $this ) );	// The Media Controller will fetch and store remote media
-		$this->CacheController = new Controllers\Cache( $this );	// The Cache controller manages and CRUDs the cache
+		$this->setFileController( new Controllers\FileLocalController( $this ) );	// The Media Controller will fetch and store remote media
+		$this->CacheController = new Controllers\CacheController( $this );	// The Cache controller manages and CRUDs the cache
 
 		// Allow for overloading the constructor values
 		if( !is_null( $localPath ) ){
@@ -339,13 +339,13 @@ class ExpiringMediaCache{
 		return $this;
 	}
 
-	public function setFileController( Controllers\File $FileController ){
+	public function setFileController( Controllers\FileController $FileController ){
 		$this->FileController = $FileController;
 
 		return $this;
 	}
 
-	public function setLifetime( int $Lifetime){
+	public function setLifetime( int $Lifetime ){
 		$this->CacheController->setLifetime( $Lifetime );
 
 		return $this;
@@ -427,7 +427,7 @@ class ExpiringMediaCache{
 		if( empty( $localPath ) )
 			return false;
 
-		if( get_class($this->FileController) !== "FreshVine\ExpiringMediaCache\Controllers\FileLocal" )
+		if( get_class($this->FileController) !== "FreshVine\ExpiringMediaCache\Controllers\FileLocalController" )
 			return false;
 
 		// Estimate the public URL to the media-cache directory

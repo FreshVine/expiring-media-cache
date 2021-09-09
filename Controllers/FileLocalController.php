@@ -16,10 +16,10 @@ namespace FreshVine\ExpiringMediaCache\Controllers;
 
 
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
-use FreshVine\ExpiringMediaCache\Controllers\File as FileController;
-use FreshVine\ExpiringMediaCache\Models\File as FileModel;
+use FreshVine\ExpiringMediaCache\Controllers\FileController as FileController;
+use FreshVine\ExpiringMediaCache\Models\FileModel as FileModel;
 
-class FileLocal extends FileController{
+class FileLocalController extends FileController{
 	/**
 	 * Creates the directory for the given absolute path
 	 *

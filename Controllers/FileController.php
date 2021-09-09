@@ -16,9 +16,9 @@ namespace FreshVine\ExpiringMediaCache\Controllers;
 
 
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
-use FreshVine\ExpiringMediaCache\Models\File as FileModel;
+use FreshVine\ExpiringMediaCache\Models\FileModel as FileModel;
 
-abstract class File{
+abstract class FileController{
 
 	/*
 	 *	Establish Members

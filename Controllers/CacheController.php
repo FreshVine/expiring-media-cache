@@ -16,11 +16,11 @@ namespace FreshVine\ExpiringMediaCache\Controllers;
 
 
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
-use FreshVine\ExpiringMediaCache\Models\Cache as CacheModel;
+use FreshVine\ExpiringMediaCache\Models\CacheModel as CacheModel;
 use DateTime;
 use DateTimeZone;
 
-class Cache{
+class CacheController{
 	
 	public function __construct( ExpiringMediaCache $ExpiringMediaCache = NULL ){
 		if( !is_null( $ExpiringMediaCache ) )
