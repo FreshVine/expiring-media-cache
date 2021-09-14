@@ -16,11 +16,11 @@ namespace FreshVine\ExpiringMediaCache\Controllers;
 
 
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
-use FreshVine\ExpiringMediaCache\Models\Cache as CacheModel;
+use FreshVine\ExpiringMediaCache\Models\CacheModel;
 use DateTime;
 use DateTimeZone;
 
-class Cache{
+class CacheController{
 	
 	public function __construct( ExpiringMediaCache $ExpiringMediaCache = NULL ){
 		if( !is_null( $ExpiringMediaCache ) )
@@ -43,14 +43,14 @@ class Cache{
 			// There is not cache file, so lets create one
 			try{
 				$this->writeCache();
-			}catch(Exception $E) {
+			}catch( \Exception $E) {
 				throw $E;
 			}
 		}else{
 			// There is a cache file, so lets try to read it
 			try{
 				$this->loadCache();
-			}catch( Exception $E){
+			}catch( \Exception $E){
 				throw $E;
 			}
 		}
@@ -65,8 +65,10 @@ class Cache{
 	protected	$localPath;						// The absolute path to where the media and cache should be stored
 	private		$cacheFilename = '_media-cache.json';		// The filename for the cache
 	private		$cacheFilePath;					// The absolute path to the cache json file
+	private		$rawCachedData;					// Holds the raw cached data from the json file as an associative array
 	private		$cacheInBytes;
-	
+	private		$LastCleanup;					// The time of the last time the cache was cleaned up
+
 	protected	$lifetime = 7 * 24 * 60;		// The number of minutes before the cache should expire and remove media [default: 7 days]
 	protected	$cacheMethod = 'first';			// Enum/Set: From what point in time do we use the cache. From the first request, or the most recent request. [first, request] Default is 'first'
 
@@ -92,6 +94,9 @@ class Cache{
 	}
 	function getLifetime(){
 		return $this->lifetime;
+	}
+	function getLastCleanup(){
+		return $this->LastCleanup;
 	}
 
 
@@ -126,6 +131,15 @@ class Cache{
 
 		return $this;
 	}
+	function setLastCleanup( string $DatetimeString = NULL ){
+		if( !is_null( $DatetimeString ) ){
+			$this->LastCleanup  =  new DateTime( $DatetimeString, new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
+		}else{
+			$this->LastCleanup = new DateTime('NOW', new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
+		}
+
+		return $this;
+	}
 
 
 
@@ -138,7 +152,7 @@ class Cache{
 	 *
 	 * @param  string		$RemoteURL		The remote URL
 	 * @param  Cache		$CacheObject	This is a Cache model for the given cache entry
-	 * @return Cache Model object
+	 * @return FreshVine\ExpiringMediaCache\Models\CacheModel
 	 */
 	public function add( String $RemoteURL, CacheModel $CacheModel = NULL ){
 		if( is_null( $CacheModel ) ){
@@ -198,57 +212,83 @@ class Cache{
 
 
 	/**
-	 * Return the data from the current cache file
+	 * Load the data from the current cache file
 	 *
-	 * @return array
+	 * @return	boolean
 	 */
 	private function getCache(){
 		// Cache file has already been confirmed to exist.
-		$rawCacheData = $this->ExpiringMediaCache->fileRead( $this->getCacheFilename() );
-		if( empty( $rawCacheData ) ){
+		$rawJSONData = $this->ExpiringMediaCache->fileRead( $this->getCacheFilename() );
+		if( empty( $rawJSONData ) ){
 			throw new \Exception('ExpiringMediaCache: Attempted to load the cache but the file is empty - ' . $this->getCacheFilePath() );
 		}
 
 		// Ensure that this file is a valid JSON format
-		$cachedData = json_decode( $rawCacheData, true );
-		if( empty( $cachedData ) || !array_key_exists('media', $cachedData) ){
+		$this->rawCachedData = json_decode( $rawJSONData, true );
+		if( empty( $this->rawCachedData  ) || !array_key_exists('media', $this->rawCachedData ) ){
 			throw new \Exception('ExpiringMediaCache: The existing cache contains invalid JSON - ' . $this->getCacheFilePath() );
 		}
 
-		return $cachedData;
+		return true;
 	}
 
 
 	/**
 	 * A private function that will open an existing cache file, and load it into memory for use
 	 *
-	 * @return boolean
+	 * @return	boolean
 	 */
 	public function loadCache(){
-		$cachedData = $this->getCache();
+		// Load up the JSON file into the cache
+		$this->getCache();
 
 		// Set the cache filesize
 		$this->setCacheInBytes( $this->ExpiringMediaCache->fileSize( $this->getCacheFilename() ) );
 
+		if( array_key_exists( 'LastCleanup', $this->rawCachedData ) ){
+			$this->setLastCleanup( $this->rawCachedData['LastCleanup'] );
+		}
 
-		if( !empty(  $cachedData['media'] ) ){
-			foreach( $cachedData['media'] as $remoteURL => $vars ){
-				// Create  the objects and load them into the
-				$thisObject = new CacheModel( $remoteURL, $vars );
-				$thisObject->setFlag('cached', true);
+		return true;
+	}
 
-				// Check if the file exists
-				if( $this->ExpiringMediaCache->exists( $thisObject->FileModel ) === false ){
-					$thisObject->setFlag('removed', true);
-				}
 
-				// Check if the cache has expired for this media
-				if( $this->checkExpired( $thisObject ) ){
-					$thisObject->setFlag('expired', true);
-				}
+	/**
+	 * Locate and load a specific entry from the cache
+	 * 
+	 * @param	string		$RemoteURL		This is the remote URL that we want to load from the cache
+	 * @return	boolean
+	 */
+	public function loadCacheEntry( string $RemoteURL ){
+		// Check if the file exists in the cache
+		$CheckURL = $this->ExpiringMediaCache->cleanRemoteURL( $RemoteURL );
+		if( !array_key_exists( $CheckURL, $this->rawCachedData['media'] ) ){
+			return false;
+		}
 
-				$this->ExpiringMediaCache->addToMediaIndex( $thisObject );
-			}
+		// Create  the objects and load them into the
+		$thisObject = new CacheModel( $CheckURL, $this->rawCachedData['media'][$CheckURL] );
+		$thisObject->setFlag('cached', true);
+
+		$this->ExpiringMediaCache->addToMediaIndex( $thisObject );
+
+		return true;
+	}
+	
+
+
+
+	/**
+	 * Locate and load all of the media from the cache
+	 * 
+	 * @return	boolean
+	 */
+	public function loadAllCached(){
+		if( !is_array( $this->rawCachedData ) || !array_key_exists( 'media', $this->rawCachedData ) ){
+			throw new \Exception('ExpiringMediaCache: There is no cached media to load.' );
+		}
+		foreach( $this->rawCachedData['media'] as $k => $v ){
+			$this->loadCacheEntry( $k );
 		}
 
 		return true;
@@ -258,8 +298,7 @@ class Cache{
 	/**
 	 * Return the Cache model for a given remote URL;
 	 *
-	 * @param  string		$RemoteURL	The remote URL
-	 * @return Cache Model object
+	 * @return	boolean
 	 */
 	public function writeCache(){
 		$cacheData = array();
@@ -272,26 +311,45 @@ class Cache{
 
 		// Include the current write time to the cache
 		$objDateTime = new DateTime('NOW', new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
-		$cacheData['LastWrite'] = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2012-04-23T18:25:43.511Z
+		$cacheData['LastWrite'] = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2020-07-31T20:18:34Z
+		$cacheData['LastCleanup'] = NULL;
+		$LastCleanup = $this->getLastCleanup();
+		if( !is_null( $LastCleanup ) ){
+			$cacheData['LastCleanup'] = $LastCleanup->format( ExpiringMediaCache::DatetimeFormat );
+		}
 
 
 		// Convert the objects into cache worthy syntax
-		$cacheData['media'] = array();
+		$cacheData['media'] = $this->rawCachedData['media'];	// Bring over the existing data
 		$Index = $this->ExpiringMediaCache->getMediaIndex();
 		if( !empty( $Index ) ){
-			foreach( $Index as $k => $cacheObject ){
-				$tmp = $cacheObject->toArray();
+			foreach( $Index as $k => $cacheModel ){
+				$tmp = $cacheModel->toArray();
 
-				if( is_array( $tmp ) )
+				// Media that should be remove from the cache the ->toArray() function returns NULL
+				if( is_null( $tmp ) ){
+					if( array_key_exists( $k, $cacheData['media'] ) ){
+						unset( $cacheData['media'][$k] );
+					}
+
+					continue;
+				}	
+
+				if( array_key_exists( $k, $cacheData['media'] ) ){
+					// The tmp response is a nested array, we need to un-nest it to override the existing entry for this media
+					$cacheData['media'][$k] = array_shift( $tmp );
+				}else{
 					$cacheData['media'] = $cacheData['media'] + $tmp;
+				}
 			}
 
 			ksort( $cacheData['media'] );
 		}
 
+
 		// Check if any of the data has updated
 		if( $this->ExpiringMediaCache->fileExists( $this->getCacheFilename() ) ){
-			$previousCache = $this->getCache();
+			$previousCache = $this->rawCachedData;
 
 			if( $cacheData['libraryVersion'] == $previousCache['libraryVersion'] 
 				&& $cacheData['PublicURL'] == $previousCache['PublicURL'] 
@@ -300,6 +358,10 @@ class Cache{
 				return true;	// No need to udpate the cache
 			}
 		}
+
+
+		// Update the local raw cache data incase we keep working
+		$this->rawCachedData = $cacheData;
 
 
 		// Set the cache size in bytes
@@ -316,7 +378,6 @@ class Cache{
 
 		return true;
 	}
-
 	/*
 	 * END: Manage the Cache File
 	 */

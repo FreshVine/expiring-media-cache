@@ -14,24 +14,24 @@
 
 namespace FreshVine\ExpiringMediaCache;
 
-use FreshVine\ExpiringMediaCache\Controllers\Cache;
-use FreshVine\ExpiringMediaCache\Controllers\File;
-use FreshVine\ExpiringMediaCache\Controllers\FileLocal;
-use FreshVine\ExpiringMediaCache\Models\Cache as CacheModel;
-use FreshVine\ExpiringMediaCache\Models\File as FileModel;
+use FreshVine\ExpiringMediaCache\Controllers\CacheController;
+use FreshVine\ExpiringMediaCache\Controllers\FileController;
+use FreshVine\ExpiringMediaCache\Controllers\FileLocalController;
+use FreshVine\ExpiringMediaCache\Models\CacheModel;
+use FreshVine\ExpiringMediaCache\Models\FileModel;
 use DateTimeZone;
 
 class ExpiringMediaCache{
 
 	// Establish constants to use within the library
-	const version = '0.1';
+	const version = '1.1.0';
 	const DatetimeFormat = 'Y-m-d\TH:i:s\Z';	// This is the ISO 8601 format in UTC time indicated with the Z suffix
 	const CacheTimezone =  'UTC';	// The exact timezone is not important since we use offsets, but it must be constantly applied.
 
 
 	function __construct( $localPath = NULL, $localPublicURL = NULL){
-		$this->setFileController( new Controllers\FileLocal( $this ) );	// The Media Controller will fetch and store remote media
-		$this->CacheController = new Controllers\Cache( $this );	// The Cache controller manages and CRUDs the cache
+		$this->setFileController( new Controllers\FileLocalController( $this ) );	// The Media Controller will fetch and store remote media
+		$this->CacheController = new Controllers\CacheController( $this );	// The Cache controller manages and CRUDs the cache
 
 		// Allow for overloading the constructor values
 		if( !is_null( $localPath ) ){
@@ -53,8 +53,10 @@ class ExpiringMediaCache{
 
 
 	function __destruct() {
-		// Clean up expired or missing files
-		$this->cleanUp();
+		if( $this->cleanupOnDestruct ){
+			// Clean up expired or missing files
+			$this->cleanUp();
+		}
 
 		// Ensure that we write out the cache before we shutdown
 		$this->CacheController->writeCache();
@@ -85,7 +87,7 @@ class ExpiringMediaCache{
 
 			if( $CacheObject !== false && $this->FileController->exists( $CacheObject->FileModel ))
 				return $CacheObject;	// Already cached and the file exists, so no need to process further
-		}catch( Exception $E){
+		}catch( \Exception $E){
 			echo 'Why is this not showing up';
 			// This is okay. it jsut means we keep going
 		}
@@ -160,7 +162,18 @@ class ExpiringMediaCache{
 	 * @return Boolean
 	 */
 	public function cleanUp(){
+		if( $this->instantiateCache() === false ){	// Ensure the cache is ready
+			throw new \Exception('ExpiringMediaCache: Unable to instantiate the cache');
+		}
+
 		$ExpectedFiles = array('cache' => $this->CacheController->getCacheFilename() );	// Key => Filename
+
+
+		// Ensure that we load all of the media into models.
+		if( !$this->CacheController->loadAllCached() ){
+			return false;
+		}
+		
 
 		foreach( $this->mediaIndex as $k => $CacheObject ){
 			$FileShouldRemain = true;
@@ -208,6 +221,8 @@ class ExpiringMediaCache{
 			}
 		}
 
+		$this->CacheController->setLastCleanup();	// Set the last cleanup to NOW
+
 		return true;
 	}
 
@@ -221,7 +236,9 @@ class ExpiringMediaCache{
 	public function find( String $RemoteURL ){
 		$RemoteURL = $this->cleanRemoteURL( $RemoteURL );
 		if( !array_key_exists( $RemoteURL, $this->mediaIndex ) ){
-			return false;
+			if( !$this->CacheController->loadCacheEntry( $RemoteURL ) ){
+				return false;
+			}
 		}
 
 		return $this->mediaIndex[$RemoteURL];
@@ -291,6 +308,7 @@ class ExpiringMediaCache{
 	protected	$FileController;
 	protected	$cacheInstantiated = false;		// Boolean: Has the cache been instantiated yet
 	protected	$writeEveryChange = false;		// Boolean: Do we write the cache once, or after every change.
+	protected	$cleanupOnDestruct = false;		// Boolean: Do we run through the cleanup script everytime we destruct the class.
 	protected	$mediaIndex = array();			// This is an associative array of the cache objects
 	private static $instances = array();
 
@@ -321,6 +339,9 @@ class ExpiringMediaCache{
 	public function getWriteEveryChange(){
 		return $this->WriteEveryChange;
 	}
+	public function getCleanupOnDestruct(){
+		return $this->cleanupOnDestruct;
+	}
 	/*
 	 *  END: Getters
 	 */
@@ -332,20 +353,20 @@ class ExpiringMediaCache{
 	public function setCacheMethod( string $cacheMethod ){
 		try{
 			$this->CacheController->setCacheMethod( $cacheMethod );
-		}catch( Exception $E){
+		}catch( \Exception $E){
 			throw $E;
 		}
 
 		return $this;
 	}
 
-	public function setFileController( Controllers\File $FileController ){
+	public function setFileController( Controllers\FileController $FileController ){
 		$this->FileController = $FileController;
 
 		return $this;
 	}
 
-	public function setLifetime( int $Lifetime){
+	public function setLifetime( int $Lifetime ){
 		$this->CacheController->setLifetime( $Lifetime );
 
 		return $this;
@@ -382,6 +403,12 @@ class ExpiringMediaCache{
 
 	public function setWriteEveryChange( bool $writeEveryChange ){
 		$this->writeEveryChange = $writeEveryChange;
+
+		return $this;
+	}
+
+	public function setCleanupOnDestruct( bool $cleanupOnDestruct ){
+		$this->cleanupOnDestruct = $cleanupOnDestruct;
 
 		return $this;
 	}
@@ -427,7 +454,7 @@ class ExpiringMediaCache{
 		if( empty( $localPath ) )
 			return false;
 
-		if( get_class($this->FileController) !== "FreshVine\ExpiringMediaCache\Controllers\FileLocal" )
+		if( get_class($this->FileController) !== "FreshVine\ExpiringMediaCache\Controllers\FileLocalController" )
 			return false;
 
 		// Estimate the public URL to the media-cache directory

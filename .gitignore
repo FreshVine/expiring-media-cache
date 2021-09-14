@@ -1,4 +1,5 @@
 composer.lock
+media/
 media-cache/
 test/media-cache/
 vendor/

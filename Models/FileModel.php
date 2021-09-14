@@ -17,7 +17,7 @@ namespace FreshVine\ExpiringMediaCache\Models;
 
 use FreshVine\ExpiringMediaCache\ExpiringMediaCache as ExpiringMediaCache;
 
-class File{
+class FileModel{
 	/* -- Media Members -- */
 	protected $Filename;	// Required
 	protected $Content;			// Optional - this is the content of the file
