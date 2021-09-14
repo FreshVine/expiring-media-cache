@@ -37,9 +37,7 @@ class CacheModel{
 	protected $isRemoved = false;
 
 
-	public function __construct( String $RemoteURL, Array $cacheArray = NULL, ExpiringMediaCache &$ExpiringMediaCache = NULL ){
-		if( !is_null( $ExpiringMediaCache ) )
-			$this->ExpiringMediaCache = $ExpiringMediaCache;
+	public function __construct( String $RemoteURL, Array $cacheArray = NULL ){
 
 		// Start setting up the model
 		$this->setRemoteURL( $RemoteURL );
@@ -53,19 +51,20 @@ class CacheModel{
 			$objDateTime = new DateTime('NOW', new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
 		}
 
-		$this->TimestampUTC = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2012-04-23T18:25:43.511Z
+		$this->TimestampUTC = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2020-07-31T20:18:34Z
 
 
 		// Add the Filename
 		if( is_array( $cacheArray ) && array_key_exists( 'File', $cacheArray ) && array_key_exists( 'Filename', $cacheArray['File'] ) ){
 			$LocalFilename = $cacheArray['File']['Filename'];
 		}else{
-
 			$LocalFilename = basename( $this->getRemoteURL() );
 			if( empty( $LocalFilename ) ){
 				$LocalFilename = "RANDOM";
 			}
 		}
+
+		// Create the file model
 		$this->FileModel = new FileModel( $LocalFilename );
 
 
@@ -128,7 +127,7 @@ class CacheModel{
 	 */
 	public function makeTimestampCurrent(){
 		$objDateTime = new DateTime('NOW', new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
-		$this->TimestampUTC = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2012-04-23T18:25:43.511Z
+		$this->TimestampUTC = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2020-07-31T20:18:34Z
 
 		return $this;
 	}

@@ -87,7 +87,7 @@ class ExpiringMediaCache{
 
 			if( $CacheObject !== false && $this->FileController->exists( $CacheObject->FileModel ))
 				return $CacheObject;	// Already cached and the file exists, so no need to process further
-		}catch( Exception $E){
+		}catch( \Exception $E){
 			echo 'Why is this not showing up';
 			// This is okay. it jsut means we keep going
 		}
@@ -162,7 +162,18 @@ class ExpiringMediaCache{
 	 * @return Boolean
 	 */
 	public function cleanUp(){
+		if( $this->instantiateCache() === false ){	// Ensure the cache is ready
+			throw new \Exception('ExpiringMediaCache: Unable to instantiate the cache');
+		}
+
 		$ExpectedFiles = array('cache' => $this->CacheController->getCacheFilename() );	// Key => Filename
+
+
+		// Ensure that we load all of the media into models.
+		if( !$this->CacheController->loadAllCached() ){
+			return false;
+		}
+		
 
 		foreach( $this->mediaIndex as $k => $CacheObject ){
 			$FileShouldRemain = true;
@@ -209,6 +220,8 @@ class ExpiringMediaCache{
 				}
 			}
 		}
+
+		$this->CacheController->setLastCleanup();	// Set the last cleanup to NOW
 
 		return true;
 	}
@@ -340,7 +353,7 @@ class ExpiringMediaCache{
 	public function setCacheMethod( string $cacheMethod ){
 		try{
 			$this->CacheController->setCacheMethod( $cacheMethod );
-		}catch( Exception $E){
+		}catch( \Exception $E){
 			throw $E;
 		}
 

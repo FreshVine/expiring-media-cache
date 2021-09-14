@@ -43,14 +43,14 @@ class CacheController{
 			// There is not cache file, so lets create one
 			try{
 				$this->writeCache();
-			}catch(Exception $E) {
+			}catch( \Exception $E) {
 				throw $E;
 			}
 		}else{
 			// There is a cache file, so lets try to read it
 			try{
 				$this->loadCache();
-			}catch( Exception $E){
+			}catch( \Exception $E){
 				throw $E;
 			}
 		}
@@ -277,6 +277,18 @@ class CacheController{
 	
 
 
+
+	/**
+	 * Locate and load all of the media from the cache
+	 * 
+	 * @return	boolean
+	 */
+	public function loadAllCached(){
+		if( !is_array( $this->rawCachedData ) || !array_key_exists( 'media', $this->rawCachedData ) ){
+			throw new \Exception('ExpiringMediaCache: There is no cached media to load.' );
+		}
+		foreach( $this->rawCachedData['media'] as $k => $v ){
+			$this->loadCacheEntry( $k );
 		}
 
 		return true;
