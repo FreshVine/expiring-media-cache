@@ -223,7 +223,9 @@ class ExpiringMediaCache{
 	public function find( String $RemoteURL ){
 		$RemoteURL = $this->cleanRemoteURL( $RemoteURL );
 		if( !array_key_exists( $RemoteURL, $this->mediaIndex ) ){
-			return false;
+			if( !$this->CacheController->loadCacheEntry( $RemoteURL ) ){
+				return false;
+			}
 		}
 
 		return $this->mediaIndex[$RemoteURL];
