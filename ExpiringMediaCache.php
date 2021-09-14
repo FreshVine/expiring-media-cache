@@ -24,7 +24,7 @@ use DateTimeZone;
 class ExpiringMediaCache{
 
 	// Establish constants to use within the library
-	const version = '0.1';
+	const version = '1.1.0';
 	const DatetimeFormat = 'Y-m-d\TH:i:s\Z';	// This is the ISO 8601 format in UTC time indicated with the Z suffix
 	const CacheTimezone =  'UTC';	// The exact timezone is not important since we use offsets, but it must be constantly applied.
 
