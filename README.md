@@ -65,6 +65,15 @@ The method of caching defines how to apply the lifetime to a cached item. When s
 		$ExpiringMedia->setCacheMethod( $cacheMethod );
 		$ExpiringMedia->getCacheMethod( );
 
+### CleanupOnDestruct  
+If you are not caching many files you can opt to cleanup the cache everytime the class is loaded. This can be expensive as it requires the processing of every cached entry. By default this is disabled and you need to manually call `$ExpiringMedia->cleanUp();` to remove entries that have expired, or whose media were otherwise removed.
+
+**Options:** Boolean
+**Default:** false
+
+	$ExpiringMedia->setCleanupOnDestruct( true );
+	$ExpiringMedia->getCleanupOnDestruct();
+
 ### Lifetime  
 The lifetime is the period of time in minutes that an item should remain in the cache.   
 

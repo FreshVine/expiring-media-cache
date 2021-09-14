@@ -53,8 +53,10 @@ class ExpiringMediaCache{
 
 
 	function __destruct() {
-		// Clean up expired or missing files
-		$this->cleanUp();
+		if( $this->cleanupOnDestruct ){
+			// Clean up expired or missing files
+			$this->cleanUp();
+		}
 
 		// Ensure that we write out the cache before we shutdown
 		$this->CacheController->writeCache();
@@ -291,6 +293,7 @@ class ExpiringMediaCache{
 	protected	$FileController;
 	protected	$cacheInstantiated = false;		// Boolean: Has the cache been instantiated yet
 	protected	$writeEveryChange = false;		// Boolean: Do we write the cache once, or after every change.
+	protected	$cleanupOnDestruct = false;		// Boolean: Do we run through the cleanup script everytime we destruct the class.
 	protected	$mediaIndex = array();			// This is an associative array of the cache objects
 	private static $instances = array();
 
@@ -320,6 +323,9 @@ class ExpiringMediaCache{
 	}
 	public function getWriteEveryChange(){
 		return $this->WriteEveryChange;
+	}
+	public function getCleanupOnDestruct(){
+		return $this->cleanupOnDestruct;
 	}
 	/*
 	 *  END: Getters
@@ -382,6 +388,12 @@ class ExpiringMediaCache{
 
 	public function setWriteEveryChange( bool $writeEveryChange ){
 		$this->writeEveryChange = $writeEveryChange;
+
+		return $this;
+	}
+
+	public function setCleanupOnDestruct( bool $cleanupOnDestruct ){
+		$this->cleanupOnDestruct = $cleanupOnDestruct;
 
 		return $this;
 	}
