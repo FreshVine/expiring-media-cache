@@ -217,16 +217,18 @@ class ExpiringMediaCacheTest extends TestCase{
 
 		file_put_contents( $this->ExpiringMediaCache->getLocalPath() . '_media-cache.json', json_encode( $contents, JSON_UNESCAPED_UNICODE ) );
 
-
 		// Loading the cache again  from the JSON file will mark the media as expired
 		$this->ExpiringMediaCache->reloadCache();
+
+		// Cleanup the media which should expire out the image
+		$this->ExpiringMediaCache->cleanUp();
+
+
 		$SampleExpired = $this->ExpiringMediaCache->find( $RemoteURL );	// Find the same media from before
 		$this->assertTrue( $SampleExpired->isExpired() );	// Ensure that it is now expired
 
 
-		$this->ExpiringMediaCache->cleanUp();	// This should remove any expired media images.
 		$this->assertFileDoesNotExist( $this->ExpiringMediaCache->getLocalPath() . 'great-gallery-of-evolution.jpg', 'Expired file remained after clean up' );
-
 
 
 		// Write the cache to the JSON file
