@@ -67,7 +67,8 @@ class CacheController{
 	private		$cacheFilePath;					// The absolute path to the cache json file
 	private		$rawCachedData;					// Holds the raw cached data from the json file as an associative array
 	private		$cacheInBytes;
-	
+	private		$LastCleanup;					// The time of the last time the cache was cleaned up
+
 	protected	$lifetime = 7 * 24 * 60;		// The number of minutes before the cache should expire and remove media [default: 7 days]
 	protected	$cacheMethod = 'first';			// Enum/Set: From what point in time do we use the cache. From the first request, or the most recent request. [first, request] Default is 'first'
 
@@ -93,6 +94,9 @@ class CacheController{
 	}
 	function getLifetime(){
 		return $this->lifetime;
+	}
+	function getLastCleanup(){
+		return $this->LastCleanup;
 	}
 
 
@@ -124,6 +128,15 @@ class CacheController{
 	}
 	function setLifetime( int $lifetime ){
 		$this->lifetime = $lifetime;	// This is in Minutes
+
+		return $this;
+	}
+	function setLastCleanup( string $DatetimeString = NULL ){
+		if( !is_null( $DatetimeString ) ){
+			$this->LastCleanup  =  new DateTime( $DatetimeString, new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
+		}else{
+			$this->LastCleanup = new DateTime('NOW', new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
+		}
 
 		return $this;
 	}
@@ -232,6 +245,9 @@ class CacheController{
 		// Set the cache filesize
 		$this->setCacheInBytes( $this->ExpiringMediaCache->fileSize( $this->getCacheFilename() ) );
 
+		if( array_key_exists( 'LastCleanup', $this->rawCachedData ) ){
+			$this->setLastCleanup( $this->rawCachedData['LastCleanup'] );
+		}
 
 		return true;
 	}
@@ -270,8 +286,7 @@ class CacheController{
 	/**
 	 * Return the Cache model for a given remote URL;
 	 *
-	 * @param  string		$RemoteURL	The remote URL
-	 * @return Cache Model object
+	 * @return	boolean
 	 */
 	public function writeCache(){
 		$cacheData = array();
@@ -284,7 +299,12 @@ class CacheController{
 
 		// Include the current write time to the cache
 		$objDateTime = new DateTime('NOW', new DateTimeZone( ExpiringMediaCache::CacheTimezone ) );
-		$cacheData['LastWrite'] = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2012-04-23T18:25:43.511Z
+		$cacheData['LastWrite'] = $objDateTime->format( ExpiringMediaCache::DatetimeFormat ); //  2020-07-31T20:18:34Z
+		$cacheData['LastCleanup'] = NULL;
+		$LastCleanup = $this->getLastCleanup();
+		if( !is_null( $LastCleanup ) ){
+			$cacheData['LastCleanup'] = $LastCleanup->format( ExpiringMediaCache::DatetimeFormat );
+		}
 
 
 		// Convert the objects into cache worthy syntax
