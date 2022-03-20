@@ -171,6 +171,16 @@ Every time the ExpiringMediaCache is unset the cache writing is triggered. If yo
 	$ExpiringMedia->setWriteEveryChange( true );
 	$ExpiringMedia->getWriteEveryChange( );
 
+
+### UserAgent
+To make requests for media you need to supply a user agent string. This should be updated from time to time to ensure it looks modern. Services may block certain UA strings over time.
+  
+**Default:** false  
+
+	$ExpiringMedia->setUserAgent( 'User Agent Browser String' );
+	$ExpiringMedia->getUserAgent( );
+
+
 ### FileController  
 This library includes a file controller written for the local filesystem that PHP is installed on. You may need to extend the abstracted functions in the File controller to support a different storage location (like a CDN or other). You can use the `Controllers\FileLocal.php` to help you.  
   
