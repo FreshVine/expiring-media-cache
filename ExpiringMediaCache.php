@@ -342,6 +342,9 @@ class ExpiringMediaCache{
 	public function getCleanupOnDestruct(){
 		return $this->cleanupOnDestruct;
 	}
+	public function getUserAgent(){
+		return $this->FileController->getUserAgent();
+	}
 	/*
 	 *  END: Getters
 	 */
@@ -411,6 +414,10 @@ class ExpiringMediaCache{
 		$this->cleanupOnDestruct = $cleanupOnDestruct;
 
 		return $this;
+	}
+
+	public function setUserAgent( string $userAgent ){
+		return $this->FileController->setUserAgent( $userAgent );
 	}
 	/*
 	 * End: Setters

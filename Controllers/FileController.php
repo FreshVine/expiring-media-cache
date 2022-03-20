@@ -24,7 +24,7 @@ abstract class FileController{
 	 *	Establish Members
 	 */
 	protected	$ExpiringMediaCache;			// A passed instance of the instantiator of this class
-	protected	$UserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36';
+	protected	$UserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.79 Safari/537.36';
 
 	public function __construct( ExpiringMediaCache $ExpiringMediaCache = NULL ){
 		if( !is_null( $ExpiringMediaCache ) )
